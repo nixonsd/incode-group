@@ -16,6 +16,11 @@ export class AppController {
 
   @Get('health')
   health(): string {
+    // const user = new User();
+    // Object.assign(user, { name: 'Bohdanchik' });
+    // await this.userRepository.create(user);
+
+    // return this.userRepository.getAll();
     return 'OK';
   }
 

@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ResponseInterceptor } from './response.interceptor';
 import { ConfigService } from '@nestjs/config';
-import { IAppConfig, IBaseConfig } from './shared/config';
+import { IAppConfig, IBaseConfig } from '@shared/config';
 import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {

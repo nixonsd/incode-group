@@ -1,8 +1,9 @@
-import { IsIP, IsOptional, IsPort, IsSemVer } from 'class-validator';
+import { IsIP, IsNumber, IsOptional, IsSemVer } from 'class-validator';
+import { DEFAULT_APP_PORT } from './constants';
 
 export interface IAppConfig {
   version: string;
-  port: string;
+  port: number;
   listenHost?: string;
 }
 
@@ -10,8 +11,8 @@ export class AppConfigValidator implements IAppConfig {
   @IsSemVer()
   readonly version!: string;
 
-  @IsPort()
-  readonly port!: string;
+  @IsNumber()
+  readonly port!: number;
 
   @IsIP()
   @IsOptional()
@@ -20,6 +21,6 @@ export class AppConfigValidator implements IAppConfig {
 
 export const getAppConfig = (): IAppConfig => ({
   version: process.env.APP_VERSION as string,
-  port: process.env.APP_PORT ?? '3000',
+  port: parseInt(`${process.env.APP_PORT ?? DEFAULT_APP_PORT}`, 10),
   listenHost: process.env.APP_LISTEN as string,
 });

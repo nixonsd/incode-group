@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { IBaseConfig, getBaseConfig } from './shared/config';
+import { IBaseConfig, ILoggerConfig, getBaseConfig } from '@shared/config';
 import { LoggerModule } from 'nestjs-pino';
-import { ILoggerConfig } from '@shared/config';
+import { UserModule } from './shared/user/user.module';
 
 @Module({
   imports: [
@@ -17,6 +17,7 @@ import { ILoggerConfig } from '@shared/config';
         pinoHttp: configService.get<ILoggerConfig>('logger'),
       }),
     }),
+    UserModule,
   ],
   controllers: [ AppController ],
 })

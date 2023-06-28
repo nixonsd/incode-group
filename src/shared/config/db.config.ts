@@ -1,4 +1,5 @@
-import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { DEFAULT_POSTGRE_PORT } from './constants';
 
 export interface IDatabaseConfig {
   host: string;
@@ -6,15 +7,13 @@ export interface IDatabaseConfig {
   user?: string;
   password?: string;
   db: string;
-  enableSsl: boolean;
-  directConection: boolean;
 }
 
 export class DatabaseConfigValidator implements IDatabaseConfig {
   @IsString()
   readonly host!: string;
 
-  @IsInt()
+  @IsNumber()
   readonly port!: number;
 
   @IsString()
@@ -27,30 +26,12 @@ export class DatabaseConfigValidator implements IDatabaseConfig {
 
   @IsString()
   readonly db!: string;
-
-  @IsBoolean()
-  readonly enableSsl!: boolean;
-
-  @IsBoolean()
-  readonly directConection!: boolean;
 }
 
 export const getDatabaseConfig = (): IDatabaseConfig => ({
-  host: process.env.MONGO_HOST as string,
-  port: parseInt(`${process.env.MONGO_PORT}`, 10) as number,
-  user: process.env.MONGO_USER,
-  password: process.env.MONGO_PASS,
-  db: process.env.MONGO_DB as string,
-  enableSsl: process.env.MONGO_SSL_ENABLED === 'true',
-  directConection: process.env.MONGO_DB_DIRECT_CONNECTION === 'true',
+  host: process.env.POSTGRE_HOST as string,
+  port: parseInt(`${process.env.POSTGRE_PORT ?? DEFAULT_POSTGRE_PORT}`, 10),
+  user: process.env.POSTGRE_USER,
+  password: process.env.POSTGRE_PASS,
+  db: process.env.POSTGRE_DATABASE as string,
 });
-
-export const getMongoDBUri = (config: IDatabaseConfig): string => {
-  const { user, password, host, port } = config;
-
-  if(user && password) {
-    return `mongodb://${encodeURIComponent(user)}:${encodeURIComponent(password)}@${host}:${port}`;
-  }
-
-  return `mongodb://${host}:${port}`;
-};
