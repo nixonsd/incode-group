@@ -15,19 +15,23 @@ export class UserRepository {
   ) {}
 
   async create(user: Partial<User>) {
-    await this.userRepository.save(user);
-  }
-
-  async delete(searchCriteria: SearchCriteria) {
-    await this.userRepository.delete({ ...searchCriteria });
+    return this.userRepository.save(this.userRepository.create(user));
   }
 
   async update(searchCriteria: SearchCriteria, user: Omit<Partial<User>, 'subordinates'>) {
-    await this.userRepository.update({ ...searchCriteria }, user);
+    return this.userRepository.update({ ...searchCriteria }, this.userRepository.create(user));
+  }
+
+  async delete(searchCriteria: SearchCriteria) {
+    return this.userRepository.delete({ ...searchCriteria });
+  }
+
+  async exist(searchCriteria: SearchCriteria) {
+    return this.userRepository.exist({ where: { ...searchCriteria } });
   }
 
   async findByCriteria(searchCriteria: SearchCriteria) {
-    return this.userRepository.find({ where: { ...searchCriteria } });
+    return this.userRepository.findOne({ where: { ...searchCriteria } });
   }
 
   async getSubordinates(searchCriteria: SearchCriteria) {

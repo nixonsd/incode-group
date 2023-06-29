@@ -1,7 +1,6 @@
-import { Roles } from '@/shared/roles';
-import { IsEmail, IsEnum, IsNotEmpty, IsString, IsStrongPassword } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsStrongPassword } from 'class-validator';
 
-export class UserDto {
+export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   readonly name!: string;
@@ -18,7 +17,4 @@ export class UserDto {
 
   @IsEmail()
   readonly boss!: string;
-
-  @IsEnum(Roles)
-  readonly role?: Roles;
 }

@@ -18,7 +18,9 @@
     "resolveJsonModule": true,
     "paths": {
       "@/*": ["*"],
-      "@shared/*": ["shared/*"]
+      "@shared/*": ["shared/*"],
+      "@auth/*": ["auth/*"],
+      "@profile/*": ["profile/*"]
     }
   },
   "include": ["src/**/*"]

@@ -16,11 +16,10 @@ async function bootstrap() {
 
   configureMiddleware(app);
 
-  if (listenHost) {
+  if (listenHost)
     await app.listen(port, listenHost);
-  } else {
+  else
     await app.listen(port);
-  }
 
   app.get(Logger).log(`Server is running at ${listenHost || 'localhost'}:${port} 🚀`, 'NestApplication');
 }

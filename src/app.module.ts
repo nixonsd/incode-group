@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { IBaseConfig, ILoggerConfig, getBaseConfig } from '@shared/config';
 import { LoggerModule } from 'nestjs-pino';
 import { ProfileModule } from './profile/profile.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ProfileModule } from './profile/profile.module';
       }),
     }),
     ProfileModule,
+    AuthModule,
   ],
   controllers: [ AppController ],
 })

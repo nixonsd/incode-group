@@ -4,6 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import compression from 'compression';
 import { ResponseInterceptor } from './response.interceptor';
+import { AccessTokenGuard } from './auth/guards/access-token.guard';
 
 /**
  * Configures API middleware functions

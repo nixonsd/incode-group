@@ -1,7 +1,7 @@
+import bcrypt from 'bcrypt';
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Roles } from '@shared/roles';
 import { Exclude } from 'class-transformer';
-import bcrypt from 'bcrypt';
 import { SALT_ROUNDS } from './constants';
 
 @Entity('users')
@@ -22,6 +22,10 @@ export class User {
   @Column('varchar', { length: 64 })
   public password!: string;
 
+  @Exclude()
+  @Column('varchar', { length: 64, nullable: true })
+  public refreshToken!: string | null;
+
   @Column({ type: 'enum', enum: Roles, default: Roles.REGULAR })
   public role!: Roles;
 
@@ -34,7 +38,15 @@ export class User {
 
   @BeforeInsert()
   @BeforeUpdate()
-  private async hashPassword() {
-    this.password = await bcrypt.hash(this.password, SALT_ROUNDS);
+  private async hash() {
+    if (this.password)
+      this.password = await bcrypt.hash(this.password, SALT_ROUNDS);
+
+    if (this.refreshToken)
+      this.refreshToken = await bcrypt.hash(this.refreshToken, SALT_ROUNDS);
+  }
+
+  static async verifyHash(raw: string, hash: string) {
+    return bcrypt.compare(raw, hash);
   }
 }

@@ -17,10 +17,6 @@ export class ProfileService {
     return this.userRepository.findByCriteria({ email });
   }
 
-  // async getSubordinates() {
-
-  // }
-
   async create(user: UserDto) {
     await this.userRepository.create({ ...user });
   }
