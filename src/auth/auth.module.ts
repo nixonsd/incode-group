@@ -3,7 +3,7 @@ import { AuthController } from './auth.controller';
 import { AccessTokenStrategy, RefreshTokenStrategy } from './strategies';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
-import { UserModule } from '@/shared/user';
+import { UserModule } from '@shared/user';
 
 @Module({
   imports: [

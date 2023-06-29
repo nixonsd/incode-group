@@ -1,4 +1,4 @@
-import { Roles } from '@shared/roles';
+import { Roles } from '@shared/role';
 
 export type JwtPayload = {
   id: string;

@@ -1,4 +1,4 @@
-import { Roles } from '@/shared/roles';
+import { Roles } from '@shared/role';
 import { IsEmail, IsEnum, IsNotEmpty, IsString, IsStrongPassword } from 'class-validator';
 
 export class UserDto {

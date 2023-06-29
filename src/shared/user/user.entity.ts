@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Roles } from '@shared/roles';
+import { Roles } from '@shared/role';
 import { Exclude } from 'class-transformer';
 import { SALT_ROUNDS } from './constants';
 
