@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { IBaseConfig, ILoggerConfig, getBaseConfig } from '@shared/config';
 import { LoggerModule } from 'nestjs-pino';
-import { UserModule } from './shared/user/user.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { UserModule } from './shared/user/user.module';
         pinoHttp: configService.get<ILoggerConfig>('logger'),
       }),
     }),
-    UserModule,
+    ProfileModule,
   ],
   controllers: [ AppController ],
 })

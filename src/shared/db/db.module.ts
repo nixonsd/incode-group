@@ -21,6 +21,7 @@ import { DATA_SOURCE } from './constants';
           entities: [
             `${__dirname  }/../**/*.entity{.ts,.js}`,
           ],
+          // !! Don't forget to change it back: it synchronize database and can harm prod db
           synchronize: true,
         });
 

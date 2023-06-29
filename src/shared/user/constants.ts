@@ -1,1 +1,2 @@
+export const SALT_ROUNDS = 11;
 export const USER_REPOSITORY = 'USER_REPOSITORY_PORVIDER';

@@ -1,20 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ResponseInterceptor } from './response.interceptor';
 import { ConfigService } from '@nestjs/config';
 import { IAppConfig, IBaseConfig } from '@shared/config';
 import { Logger } from 'nestjs-pino';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { configureMiddleware } from './configure-middleware';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
 
   const configService = app.get<ConfigService<IBaseConfig, true>>(ConfigService);
   const appConfig = configService.get<IAppConfig>('app');
 
   const { port, listenHost } = appConfig;
 
-  app.useLogger(app.get(Logger));
-  app.useGlobalInterceptors(new ResponseInterceptor());
+  configureMiddleware(app);
 
   if (listenHost) {
     await app.listen(port, listenHost);
