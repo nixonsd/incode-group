@@ -1,10 +1,10 @@
+import { LoggerModule } from 'nestjs-pino';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { IBaseConfig, ILoggerConfig, getBaseConfig } from '@shared/config';
-import { LoggerModule } from 'nestjs-pino';
-import { ProfileModule } from './profile/profile.module';
 import { AuthModule } from './auth/auth.module';
+import { AppController } from './app.controller';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [

@@ -1,7 +1,7 @@
+import { DataSource } from 'typeorm';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DatabaseConfigValidator, IBaseConfig } from '@shared/config';
-import { DataSource } from 'typeorm';
 import { DATA_SOURCE } from './constants';
 
 @Module({

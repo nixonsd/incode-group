@@ -1,11 +1,11 @@
-import { User, UserRepository } from '@shared/user';
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
-import { AuthDto, CreateUserDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from './types';
 import { ConfigService } from '@nestjs/config';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { User, UserRepository } from '@shared/user';
 import { IAuthConfig, IBaseConfig } from '@shared/config';
-import { ACCESS_TOKEN_EXPIRATION_TIME, REFRESH_TOKEN_EXPIRATION_TIME } from './constants';
+import { JwtPayload } from './types';
+import { AuthDto, CreateUserDto } from './dto';
+import { ACCESS_TOKEN_EXPIRATION, REFRESH_TOKEN_EXPIRATION } from './constants';
 
 @Injectable()
 export class AuthService {
@@ -87,14 +87,14 @@ export class AuthService {
   async getAccessToken(jwtPayload: JwtPayload) {
     return this.jwtService.signAsync(jwtPayload, {
       secret: this.authConfig.accessSecret,
-      expiresIn: ACCESS_TOKEN_EXPIRATION_TIME,
+      expiresIn: ACCESS_TOKEN_EXPIRATION,
     });
   }
 
   async getRefreshToken(jwtPayload: JwtPayload) {
     return this.jwtService.signAsync(jwtPayload, {
       secret: this.authConfig.refreshSecret,
-      expiresIn: REFRESH_TOKEN_EXPIRATION_TIME,
+      expiresIn: REFRESH_TOKEN_EXPIRATION,
     });
   }
 }

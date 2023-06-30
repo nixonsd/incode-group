@@ -1,8 +1,8 @@
+import { DataSource } from 'typeorm';
 import { Module } from '@nestjs/common';
 import { DATA_SOURCE, DBModule } from '@shared/db';
-import { USER_REPOSITORY } from './constants';
-import { DataSource } from 'typeorm';
 import { User } from './user.entity';
+import { USER_REPOSITORY } from './constants';
 import { UserRepository } from './user.repository';
 
 @Module({

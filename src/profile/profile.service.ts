@@ -1,5 +1,5 @@
-import { UserRepository } from '@shared/user';
 import { Injectable } from '@nestjs/common';
+import { UserRepository } from '@shared/user';
 import { UserDto } from './dto';
 
 

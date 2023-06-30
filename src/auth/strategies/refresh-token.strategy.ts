@@ -1,10 +1,10 @@
-import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Injectable } from '@nestjs/common';
-import { IAuthConfig, IBaseConfig } from '@shared/config';
 import { ConfigService } from '@nestjs/config';
+import { PassportStrategy } from '@nestjs/passport';
 import { JwtPayload } from '@auth/types';
+import { IAuthConfig, IBaseConfig } from '@shared/config';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(

@@ -2,9 +2,8 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards } fro
 import { Public } from './constants';
 import { AuthService } from './auth.service';
 import { AuthDto, CreateUserDto } from './dto';
-import { AccessTokenGuard } from './guards/access-token.guard';
-import { RefreshTokenGuard } from './guards';
 import { LoggedRequest, RefreshRequest } from './types';
+import { AccessTokenGuard, RefreshTokenGuard } from './guards';
 
 @Controller('v0/auth')
 export class AuthController {

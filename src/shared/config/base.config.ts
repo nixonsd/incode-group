@@ -1,9 +1,9 @@
+import { Type, plainToClass } from 'class-transformer';
 import { ValidateNested, validateSync } from 'class-validator';
 import { AppConfigValidator, IAppConfig, getAppConfig } from './app.config';
-import { Type, plainToClass } from 'class-transformer';
+import { AuthConfigValidator, IAuthConfig, getAuthConfig } from './auth.config';
 import { ILoggerConfig, LoggerConfigValidator, getLoggerConfig } from './logger.config';
 import { DatabaseConfigValidator, IDatabaseConfig, getDatabaseConfig } from './db.config';
-import { AuthConfigValidator, IAuthConfig, getAuthConfig } from './auth.config';
 
 export interface IBaseConfig {
   app: IAppConfig;

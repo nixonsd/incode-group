@@ -1,5 +1,5 @@
-import { Roles } from '@shared/role';
 import { IsEmail, IsEnum, IsNotEmpty, IsString, IsStrongPassword } from 'class-validator';
+import { Roles } from '@shared/role';
 
 export class UserDto {
   @IsString()

@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import { USER_REPOSITORY } from './constants';
 import { User } from './user.entity';
+import { USER_REPOSITORY } from './constants';
 
 export type SearchCriteria = {
   id?: string;

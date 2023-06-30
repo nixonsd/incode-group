@@ -1,9 +1,9 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ConfigService } from '@nestjs/config';
-import { IAppConfig, IBaseConfig } from '@shared/config';
 import { Logger } from 'nestjs-pino';
+import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { IAppConfig, IBaseConfig } from '@shared/config';
+import { AppModule } from './app.module';
 import { configureMiddleware } from './configure-middleware';
 
 async function bootstrap() {

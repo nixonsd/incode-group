@@ -1,7 +1,7 @@
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IAppConfig, IBaseConfig } from '@shared/config';
-import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 @Controller()
 export class AppController {
