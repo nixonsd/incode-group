@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Roles } from '@shared/role';
+import { RoleEnum } from '@shared/role';
 import { SALT_ROUNDS } from './constants';
 
 @Entity('users')
@@ -26,8 +26,8 @@ export class User {
   @Column('varchar', { length: 64, nullable: true })
   public refreshToken!: string | null;
 
-  @Column({ type: 'enum', enum: Roles, default: Roles.REGULAR })
-  public role!: Roles;
+  @Column({ type: 'enum', enum: RoleEnum, default: RoleEnum.REGULAR })
+  public role!: RoleEnum;
 
   @ManyToOne(() => User, (boss) => boss.email)
   @JoinColumn({ name: 'boss', referencedColumnName: 'email' })

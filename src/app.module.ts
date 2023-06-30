@@ -1,10 +1,13 @@
 import { LoggerModule } from 'nestjs-pino';
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { RoleGuard } from '@shared/role';
+import { AuthModule } from '@auth/auth.module';
+import { ProfileModule } from '@profile/profile.module';
 import { IBaseConfig, ILoggerConfig, getBaseConfig } from '@shared/config';
-import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
-import { ProfileModule } from './profile/profile.module';
+import { AccessTokenGuard } from './auth/guards';
 
 @Module({
   imports: [
@@ -22,5 +25,15 @@ import { ProfileModule } from './profile/profile.module';
     AuthModule,
   ],
   controllers: [ AppController ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AccessTokenGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RoleGuard,
+    },
+  ],
 })
 export class AppModule {}

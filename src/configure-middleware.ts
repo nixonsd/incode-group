@@ -3,7 +3,7 @@ import { Logger } from 'nestjs-pino';
 import compression from 'compression';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { ResponseInterceptor } from './response.interceptor';
+import { ResponseInterceptor, TransformInterceptor } from '@shared/interceptors';
 
 /**
  * Configures API middleware functions
@@ -27,5 +27,6 @@ export const configureMiddleware = (app: NestExpressApplication): void => {
 
   app.setGlobalPrefix('api');
 
+  app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalInterceptors(new ResponseInterceptor());
 };

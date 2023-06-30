@@ -13,8 +13,8 @@ export class ProfileService {
     return this.userRepository.findByCriteria({ id });
   }
 
-  async getByEmail(email: string) {
-    return this.userRepository.findByCriteria({ email });
+  async getSubordinatesById(id: string) {
+    return this.userRepository.getSubordinates({ id });
   }
 
   async create(user: UserDto) {
