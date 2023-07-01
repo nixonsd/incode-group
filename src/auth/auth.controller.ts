@@ -25,13 +25,13 @@ export class AuthController {
 
   @Get('logout')
   async logout(@Req() req: LoggedRequest) {
-    await this.authService.logout(req.user.id);
+    await this.authService.logout(req.user.email);
   }
 
   @Public()
   @Get('refresh')
   @UseGuards(RefreshTokenGuard)
   async refresh(@Req() req: RefreshRequest) {
-    return this.authService.refreshTokens(req.user.id, req.user.refreshToken);
+    return this.authService.refreshTokens(req.user.email, req.user.refreshToken);
   }
 }

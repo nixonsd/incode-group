@@ -17,7 +17,7 @@ export class UserDto {
   readonly password!: string;
 
   @IsEmail()
-  readonly boss!: string;
+  readonly boss!: string | null;
 
   @IsEnum(RoleEnum)
   readonly role?: RoleEnum;

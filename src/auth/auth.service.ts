@@ -20,10 +20,9 @@ export class AuthService {
   }
 
   async signUp(createUserDto: CreateUserDto) {
-    const exist = await this.userRepository.exist({ email: createUserDto.email });
-    if (exist) {
+    const exist = await this.userRepository.get({ field: 'email', value: createUserDto.email });
+    if (exist)
       throw new BadRequestException('User already exists');
-    }
 
     const { id, name, role, email } = await this.userRepository.create(createUserDto);
     const jwtPayload: JwtPayload = { id, name, role, email };
@@ -31,25 +30,29 @@ export class AuthService {
     const accessToken = await this.getAccessToken(jwtPayload);
     const refreshToken = await this.getRefreshToken(jwtPayload);
 
-    await this.userRepository.update({ id }, { refreshToken });
+    await this.userRepository.updateRefreshToken({
+      field: 'email',
+      value: email,
+    }, refreshToken);
 
     return [ accessToken, refreshToken ];
   }
 
-  async logout(userId: string) {
-    return this.userRepository.update({ id: userId }, { refreshToken: null });
+  async logout(email: string) {
+    return this.userRepository.updateRefreshToken({
+      field: 'email',
+      value: email,
+    }, null);
   }
 
   async signIn(authDto: AuthDto) {
-    const user = await this.userRepository.findByCriteria({ email: authDto.email });
-    if (!user) {
+    const user = await this.userRepository.get({ field: 'email', value: authDto.email });
+    if (!user)
       throw new BadRequestException('User does not exist');
-    }
 
     const passwordMatchers = await User.verifyHash(authDto.password, user.password);
-    if (!passwordMatchers) {
+    if (!passwordMatchers)
       throw new BadRequestException('Password is incorrect');
-    }
 
     const { id, name, role, email } = user;
     const jwtPayload: JwtPayload = { id, name, role, email };
@@ -57,29 +60,33 @@ export class AuthService {
     const accessToken = await this.getAccessToken(jwtPayload);
     const refreshToken = await this.getRefreshToken(jwtPayload);
 
-    await this.userRepository.update({ id: user.id }, { refreshToken });
+    await this.userRepository.updateRefreshToken({
+      field: 'email',
+      value: email,
+    }, refreshToken);
 
     return [ accessToken, refreshToken ];
   }
 
-  async refreshTokens(userId: string, refreshTokenOld: string) {
-    const user = await this.userRepository.findByCriteria({ id: userId });
-    if (!user || !user.refreshToken) {
+  async refreshTokens(email: string, refreshTokenOld: string) {
+    const user = await this.userRepository.get({ field: 'email', value: email });
+    if (!user || !user.refreshToken)
       throw new ForbiddenException('Access Denied');
-    }
 
     const refreshTokenMatchers = await User.verifyHash(refreshTokenOld, user.refreshToken);
-    if (!refreshTokenMatchers) {
+    if (!refreshTokenMatchers)
       throw new ForbiddenException('Access Denied');
-    }
 
-    const { id, name, role, email } = user;
+    const { id, name, role } = user;
     const jwtPayload: JwtPayload = { id, name, role, email };
 
     const accessToken = await this.getAccessToken(jwtPayload);
     const refreshToken = await this.getRefreshToken(jwtPayload);
 
-    await this.userRepository.update({ id }, { refreshToken });
+    await this.userRepository.updateRefreshToken({
+      field: 'email',
+      value: email,
+    }, refreshToken);
 
     return [ accessToken, refreshToken ];
   }
