@@ -1,73 +1,83 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# incode-group
+The application was produced due to testing purposes. The application can be spread under the MIT license. The application is a simple implementation in Node.js (using the Nest.js framework) of a simple web application with authorization and authentication.
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Requirements
+- PostgreSQL Running
+- Node.js and npm
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Clone repository
+Use the command to clone this repository to your computer:
+``` bash
+$ git clone https://github.com/nixonsd/incode-group.git
+```
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+If you want to clone it into the existing folder use:
+```bash
+$ cd ./desired-folder
+$ git clone https://github.com/nixonsd/incode-group.git .
+```
 
 ## Installation
+Create the environmental file `.env` (or use the system environment on its own) and fill this file as shown in the `.env.example` file that you have in your repository.
 
+### Example
+```bash
+# !!! > Do not use these variables on production! These variables are exposed!
+
+### Example
+# Set level of application
+NODE_ENV=production
+
+# App
+APP_VERSION=0.0.1
+APP_PORT=3000
+
+# Init
+INIT_ADMIN_NAME=Boris
+INIT_ADMIN_SURNAME=Johnson
+INIT_ADMIN_EMAIL=testemail@gmail.com
+INIT_ADMIN_PASSWORD="KGhqXE'U6=eJ)8k9"
+
+# PostgreSQL
+POSTGRE_HOST=localhost
+POSTGRE_PORT=5432
+POSTGRE_USER=postgres
+POSTGRE_PASS=12345678
+POSTGRE_DATABASE=test
+
+# Auth
+JWT_ACCESS_SECRET=aAjXpuQ6f6Gne4Hy5BuU1VFWhTSV3iumdnjPJR60nDIejHh6CLIXK4rYRzB2DPuAB+o55EEFCiqNLTuLRWpVfpkP0wOZK7GiHUtO4r36PNIH4L2PDO5iBwHLYe921nwKtptDO5m1isUvY15RfRolkWWGbuqe87cVVRZT76vlhcfxSB5a85TM61BYvBtrs9rUbFnsfnYLaQJZ3arYJV7a6sPSs1E+InD2H+tk4dUrg675t+0b6IlyDT+6Ll0CovzDjnupuG60Ku9XKu7xIjNlrXCPxX6uXow/q3eICfY8aMwNSwqzej6VblVvwQGTrdWxjj1VEOEEd0+8Z2zpqdgdwQ==
+JWT_REFRESH_SECRET=4t/RQuzs8ohBDcNgk9WHLgICyCDXxLd6hVgw1R7alxB7NRHq45CgpieA4nHF6ENXEBp6uP1tFtwQiFD7FY0mloMpkNBxk4vL/1ng5qTUuycuAH34c7v6sI3IwfLobOR3x1IaKHa9sQRDw/7LqTSUfSn3wdhED+7TF5jcrKidBP6U6MloyAheOBQmCVap9VuHEuzUM0OBTt+3nFKQw28hC4L3QyOFIS6TMqvipc0nGjHRs4qZdZ/WfXSOhXNKg0KGcTWnGx7ygkKbziSd4NKe8i2M8Z/wLeM9nI9NfpwhLbyariOUEJZXwPB+cbZ1GUEtr/vBN9XtGBfj8E4c5KcGIw==
+```
+
+Before usage, you must install all required dependencies with the command below:
 ```bash
 $ npm install
+```
+To create the database entity and initial user (check `INIT_ADMIN_*` `.env` variables), run:
+```bash
+$ npm run start:init:db
+```
+You have all the prerequisites installed. 
+
+## Documentation
+The documentation is provided using [Swagger](https://swagger.io/), reach it by running your application by accessing the endpoint (by GET request):
+```
+http://localhost:3000/swagger-api
 ```
 
 ## Running the app
 
 ```bash
-# development
-$ npm run start
-
 # watch mode
 $ npm run start:dev
+
+# development
+$ npm run start
 
 # production mode
 $ npm run start:prod
 ```
 
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
 ## License
-
-Nest is [MIT licensed](LICENSE).
+Use the code base on your own needs without any limitations. The application is distributed under MIT License.
