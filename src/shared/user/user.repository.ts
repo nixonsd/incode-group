@@ -29,7 +29,6 @@ export class UserRepository {
 
     const fromUser = users.find(user => user.email === from) as User & {subordinatesCount: number} | undefined;
     const toUser = users.find(user => user.email === to) as User & {subordinatesCount: number} | undefined;
-    console.log('fromUser', fromUser, 'toUser', toUser);
     if (!fromUser || !toUser)
       throw new NotFoundException('User is not found');
 
