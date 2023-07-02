@@ -19,7 +19,8 @@ export class UserAbility {
     else
       can(ActionEnum.Check, 'all');
 
-    can(ActionEnum.Update, User, { boss: user.email });
+    if (user.role !== RoleEnum.REGULAR)
+      can(ActionEnum.Update, User, { boss: user.email });
 
     return build({
       detectSubjectType: (item) =>

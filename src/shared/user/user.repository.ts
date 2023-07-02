@@ -1,5 +1,5 @@
 import { DeepPartial, Repository } from 'typeorm';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { RoleEnum } from '@shared/role';
 import { User } from './user.entity';
 import { USER_REPOSITORY } from './constants';
@@ -19,8 +19,29 @@ export class UserRepository {
     return this.userRepository.save(this.createInstance(user));
   }
 
-  async setBoss(criteria: UserCriteria, boss: string) {
-    await this.userRepository.update({ [criteria.field]: criteria.value }, { boss });
+  async transferSubordinate(criteria: UserCriteria, from: string, to: string) {
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.subordinates', 'subordinates')
+      .loadRelationCountAndMap('user.subordinatesCount', 'user.subordinates')
+      .where('user.email IN (:...emails)', { emails: [ from, to ] })
+      .getMany();
+
+    const fromUser = users.find(user => user.email === from) as User & {subordinatesCount: number} | undefined;
+    const toUser = users.find(user => user.email === to) as User & {subordinatesCount: number} | undefined;
+    console.log('fromUser', fromUser, 'toUser', toUser);
+    if (!fromUser || !toUser)
+      throw new NotFoundException('User is not found');
+
+    if (fromUser.role !== RoleEnum.ADMINISTRATOR && fromUser.subordinatesCount - 1 < 1) {
+      await this.updateRole({ field: 'email', value: from }, RoleEnum.REGULAR);
+    }
+
+    if (toUser.role !== RoleEnum.ADMINISTRATOR && toUser.subordinatesCount + 1 >= 1) {
+      await this.updateRole({ field: 'email', value: to }, RoleEnum.BOSS);
+    }
+
+    await this.userRepository.update({ [criteria.field]: criteria.value }, { boss: to });
   }
 
   async updateRole(criteria: UserCriteria, role: RoleEnum) {

@@ -20,7 +20,8 @@ export class ProfileService {
       throw new BadRequestException('Boss is not found');
 
     const ability = this.userAbility.ofUser(bossUser);
-    if (ability.cannot(ActionEnum.Update, User))
+    const userInstance = this.userRepository.createInstance(user);
+    if (ability.cannot(ActionEnum.Update, userInstance))
       await this.userRepository.updateRole({ field: 'email', value: boss }, RoleEnum.BOSS);
 
     return this.userRepository.create(
@@ -31,13 +32,15 @@ export class ProfileService {
   async updateBoss(issuer: User, id: string, boss: string) {
     const subordinate = await this.userRepository.get({ field: 'id', value: id });
     if (!subordinate)
-      throw new BadRequestException('Subordinate is not found');
+      throw new NotFoundException('Subordinate is not found');
+    if (!subordinate.boss)
+      throw new BadRequestException('Boss cannot be changed')
 
-    const ability = this.userAbility.ofUser(issuer);
-    if (ability.cannot(ActionEnum.Update, subordinate))
+    const issuerAbility = this.userAbility.ofUser(issuer);
+    if (issuerAbility.cannot(ActionEnum.Update, subordinate))
       throw new ForbiddenException('Forbidden resource');
 
-    await this.userRepository.setBoss({ field: 'id', value: id }, boss);
+    await this.userRepository.transferSubordinate({ field: 'id', value: id }, subordinate.boss, boss);
   }
 
   async getById(id: string) {
@@ -58,5 +61,19 @@ export class ProfileService {
       return this.userRepository.getAll();
 
     return user;
+  }
+
+  async onSubordinate(bossId: string) {
+    const boss = await this.userRepository.getUserWithSubordinates({ field: 'id', value: bossId });
+    if (!boss)
+      throw new NotFoundException('Boss is not found');
+
+    if (!boss?.subordinates?.length) {
+      boss.role = RoleEnum.REGULAR;
+    }
+
+    if (boss?.subordinates?.length && boss.role === RoleEnum.REGULAR)
+      boss.role = RoleEnum.BOSS;
+    await this.userRepository.updateRole({ field: 'id', value: bossId }, RoleEnum.BOSS);
   }
 }
