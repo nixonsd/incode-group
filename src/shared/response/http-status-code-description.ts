@@ -5,4 +5,5 @@ export enum HttpStatusCodeDescription {
   NOT_FOUND = 'Not found error',
   CONFLICT = 'Conflict',
   NO_CONTENT = 'No content',
+  UNAUTHORIZED_ACCESS = 'Unauthorized access'
 }

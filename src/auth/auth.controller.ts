@@ -4,9 +4,19 @@ import { AuthService } from './auth.service';
 import { RefreshTokenGuard } from './guards';
 import { AuthDto } from './dto';
 import { AuthOkResponseItem, LoggedRequest, RefreshRequest } from './types';
-import { ApiBadRequestResponse, ApiExtraModels, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiExtraModels,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { HttpStatusCodeDescription } from '@shared/response';
-import { BadRequestException, InternalServerException, NotFoundEx } from '@shared/response-exception';
+import { BadRequestException, InternalServerException, NotFoundEx, UnauthorizedException } from '@shared/response-exception';
 
 @ApiTags('Auth')
 @Controller('v0/auth')
@@ -45,10 +55,6 @@ export class AuthController {
     };
   }
 
-  @ApiBadRequestResponse({
-    description: HttpStatusCodeDescription.BAD_REQUEST,
-    type: BadRequestException,
-  })
   @ApiOkResponse({
     description: HttpStatusCodeDescription.SUCCESS,
   })
@@ -56,10 +62,11 @@ export class AuthController {
     description: HttpStatusCodeDescription.INTERNAL_SERVER_ERROR,
     type: InternalServerException,
   })
-  @ApiNotFoundResponse({
-    description: HttpStatusCodeDescription.NOT_FOUND,
-    type: NotFoundEx,
+  @ApiUnauthorizedResponse({
+    description: HttpStatusCodeDescription.UNAUTHORIZED_ACCESS,
+    type: UnauthorizedException,
   })
+  @ApiBearerAuth('JWT Authentication')
   @ApiOperation({
     summary: 'Logout from account',
   })
@@ -68,10 +75,6 @@ export class AuthController {
     await this.authService.logout(req.user.email);
   }
 
-  @ApiBadRequestResponse({
-    description: HttpStatusCodeDescription.BAD_REQUEST,
-    type: BadRequestException,
-  })
   @ApiOkResponse({
     description: HttpStatusCodeDescription.SUCCESS,
     type: AuthOkResponseItem,
@@ -79,10 +82,6 @@ export class AuthController {
   @ApiInternalServerErrorResponse({
     description: HttpStatusCodeDescription.INTERNAL_SERVER_ERROR,
     type: InternalServerException,
-  })
-  @ApiNotFoundResponse({
-    description: HttpStatusCodeDescription.NOT_FOUND,
-    type: NotFoundEx,
   })
   @ApiOperation({
     summary: 'Refresh user\'s access and refresh keys',

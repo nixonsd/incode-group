@@ -34,7 +34,7 @@ export class ProfileService {
     if (!subordinate)
       throw new NotFoundException('Subordinate is not found');
     if (!subordinate.boss)
-      throw new BadRequestException('Boss cannot be changed')
+      throw new BadRequestException('Boss cannot be changed');
 
     const issuerAbility = this.userAbility.ofUser(issuer);
     if (issuerAbility.cannot(ActionEnum.Update, subordinate))
@@ -51,7 +51,7 @@ export class ProfileService {
     return user;
   }
 
-  async getSubordinatesById(id: string) {
+  async getSubordinatesById(issuer: User, id: string) {
     const user = await this.userRepository.getUserWithSubordinates({ field: 'id', value: id });
     if (!user)
       throw new NotFoundException('User is not found');
