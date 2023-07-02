@@ -31,6 +31,7 @@ export class User {
 
   @ManyToOne(() => User, (boss) => boss.email, { nullable: true })
   @JoinColumn({ name: 'boss', referencedColumnName: 'email' })
+  @Column('varchar', { name: 'boss', length: 256, nullable: true })
   public boss!: string | null;
 
   @OneToMany(() => User, (subordinate) => subordinate.boss, { nullable: true })

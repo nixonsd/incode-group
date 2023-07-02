@@ -1,14 +1,16 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { LoggedRequest } from '@auth/types';
-import { User } from '@shared/user';
-import { ActionEnum, AppAbility, CheckPolicies, PoliciesGuard, RoleEnum, Roles, UserAbility } from '@shared/role';
+import { User, UserRepository } from '@shared/user';
+import { ActionEnum, AppAbility, CheckPolicies, PoliciesGuard } from '@shared/role';
 import { UserDto, UserSearchDto } from './dto';
 import { ProfileService } from './profile.service';
+import { UpdateBossDto } from './dto/update-boss.dto';
 
 @Controller('v0/profile')
 export class ProfileController {
-  constructor(private readonly profileService: ProfileService,
-    private readonly userAbility: UserAbility,
+  constructor(
+    private readonly profileService: ProfileService,
+    private readonly userRepository: UserRepository,
   ) {}
 
   @Get()
@@ -17,7 +19,6 @@ export class ProfileController {
   }
 
   @Get('subordinates')
-  @Roles(RoleEnum.ADMINISTRATOR, RoleEnum.BOSS)
   async getSubordinates(@Req() req: LoggedRequest) {
     return this.profileService.getSubordinatesById(req.user.id);
   }
@@ -27,21 +28,23 @@ export class ProfileController {
     return this.profileService.getById(userSearch.id);
   }
 
-  @Patch(':id')
-  @CheckPolicies((ability: AppAbility) => ability.can(ActionEnum.Create, User))
-  async updateUser(
-    @Req() req: LoggedRequest,
-    @Param() userSearch: UserSearchDto,
-    @Body() user: UserDto,
-  ) {
-    if (req.)
+  @Patch(':id/boss')
+  async updateBoss(@Req() req: LoggedRequest, @Param() userSearch: UserSearchDto, @Body() updateBoss: UpdateBossDto) {
+    return this.profileService.updateBoss(
+      this.userRepository.createInstance(req.user),
+      userSearch.id,
+      updateBoss.bossEmail,
+    );
   }
 
   @Post()
   @UseGuards(PoliciesGuard)
   @CheckPolicies((ability: AppAbility) => ability.can(ActionEnum.Create, User))
   @HttpCode(HttpStatus.OK)
-  async create(@Body() user: UserDto) {
-    await this.profileService.create(user);
+  async create(@Req() req: LoggedRequest, @Body() user: UserDto) {
+    return this.profileService.create(
+      this.userRepository.createInstance(req.user),
+      user,
+    );
   }
 }

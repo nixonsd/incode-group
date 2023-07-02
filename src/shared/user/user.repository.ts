@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import { RoleEnum } from '@shared/role';
 import { User } from './user.entity';
@@ -15,8 +15,12 @@ export class UserRepository {
     @Inject(USER_REPOSITORY) private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(user: Partial<User>) {
-    return this.userRepository.save(this.userRepository.create(user));
+  async create(user: DeepPartial<User>) {
+    return this.userRepository.save(this.createInstance(user));
+  }
+
+  async setBoss(criteria: UserCriteria, boss: string) {
+    await this.userRepository.update({ [criteria.field]: criteria.value }, { boss });
   }
 
   async updateRole(criteria: UserCriteria, role: RoleEnum) {
@@ -24,7 +28,7 @@ export class UserRepository {
   }
 
   async updateRefreshToken(criteria: UserCriteria, refreshToken: string | null) {
-    const user = this.userRepository.create({ refreshToken });
+    const user = this.createInstance({ refreshToken });
     await this.userRepository.update({ [criteria.field]: criteria.value }, user);
   }
 
@@ -32,12 +36,6 @@ export class UserRepository {
     return this.userRepository
       .findOne({ select: { role: true }, where: { [criteria.field]: criteria.value } })
       .then(user => user ? user.role : null);
-  }
-
-  async getBossOfUser(criteria: UserCriteria): Promise<string|null> {
-    return this.userRepository
-      .findOne({ select: { role: true }, where: { [criteria.field]: criteria.value }, relations: [ 'boss' ] })
-      .then(user => user ? user.boss : null);
   }
 
   async getUserWithSubordinates(criteria: UserCriteria) {
@@ -55,5 +53,9 @@ export class UserRepository {
 
   async getAll() {
     return this.userRepository.find();
+  }
+
+  createInstance(user: DeepPartial<User>) {
+    return this.userRepository.create(user);
   }
 }
