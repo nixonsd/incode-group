@@ -2,19 +2,12 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards } fro
 import { Public } from './decorators';
 import { AuthService } from './auth.service';
 import { RefreshTokenGuard } from './guards';
-import { AuthDto, CreateUserDto } from './dto';
+import { AuthDto } from './dto';
 import { LoggedRequest, RefreshRequest } from './types';
 
 @Controller('v0/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
-  @Public()
-  @Post('signup')
-  @HttpCode(HttpStatus.OK)
-  async signUp(@Body() createUserDto: CreateUserDto) {
-    return this.authService.signUp(createUserDto);
-  }
 
   @Public()
   @Post('signin')

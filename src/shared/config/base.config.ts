@@ -4,8 +4,10 @@ import { AppConfigValidator, IAppConfig, getAppConfig } from './app.config';
 import { AuthConfigValidator, IAuthConfig, getAuthConfig } from './auth.config';
 import { ILoggerConfig, LoggerConfigValidator, getLoggerConfig } from './logger.config';
 import { DatabaseConfigValidator, IDatabaseConfig, getDatabaseConfig } from './db.config';
+import { IInitConfig, InitConfigValidator, getInitConfig } from './init.config';
 
 export interface IBaseConfig {
+  init: IInitConfig;
   app: IAppConfig;
   auth: IAuthConfig;
   logger: ILoggerConfig;
@@ -13,6 +15,10 @@ export interface IBaseConfig {
 }
 
 export class BaseConfigValidator implements IBaseConfig {
+  @ValidateNested()
+  @Type(() => InitConfigValidator)
+  readonly init!: InitConfigValidator;
+
   @ValidateNested()
   @Type(() => AppConfigValidator)
   readonly app!: AppConfigValidator;
@@ -32,6 +38,7 @@ export class BaseConfigValidator implements IBaseConfig {
 
 export const getBaseConfig = (): IBaseConfig => {
   const config: IBaseConfig = {
+    init: getInitConfig(),
     app: getAppConfig(),
     auth: getAuthConfig(),
     logger: getLoggerConfig(),

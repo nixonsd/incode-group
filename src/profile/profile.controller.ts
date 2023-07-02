@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, U
 import { LoggedRequest } from '@auth/types';
 import { User, UserRepository } from '@shared/user';
 import { ActionEnum, AppAbility, CheckPolicies, PoliciesGuard } from '@shared/role';
-import { UserDto, UserSearchDto } from './dto';
+import { CreateUserDto, UserSearchDto } from './dto';
 import { ProfileService } from './profile.service';
 import { UpdateBossDto } from './dto/update-boss.dto';
 
@@ -41,7 +41,7 @@ export class ProfileController {
   @UseGuards(PoliciesGuard)
   @CheckPolicies((ability: AppAbility) => ability.can(ActionEnum.Create, User))
   @HttpCode(HttpStatus.OK)
-  async create(@Req() req: LoggedRequest, @Body() user: UserDto) {
+  async create(@Req() req: LoggedRequest, @Body() user: CreateUserDto) {
     return this.profileService.create(
       this.userRepository.createInstance(req.user),
       user,

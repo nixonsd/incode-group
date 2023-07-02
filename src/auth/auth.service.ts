@@ -4,7 +4,7 @@ import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/com
 import { User, UserRepository } from '@shared/user';
 import { IAuthConfig, IBaseConfig } from '@shared/config';
 import { JwtPayload } from './types';
-import { AuthDto, CreateUserDto } from './dto';
+import { AuthDto } from './dto';
 import { ACCESS_TOKEN_EXPIRATION, REFRESH_TOKEN_EXPIRATION } from './constants';
 
 @Injectable()
@@ -17,25 +17,6 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {
     this.authConfig = this.configService.get<IAuthConfig>('auth');
-  }
-
-  async signUp(createUserDto: CreateUserDto) {
-    const exist = await this.userRepository.get({ field: 'email', value: createUserDto.email });
-    if (exist)
-      throw new BadRequestException('User already exists');
-
-    const { id, name, role, email } = await this.userRepository.create(createUserDto);
-    const jwtPayload: JwtPayload = { id, name, role, email };
-
-    const accessToken = await this.getAccessToken(jwtPayload);
-    const refreshToken = await this.getRefreshToken(jwtPayload);
-
-    await this.userRepository.updateRefreshToken({
-      field: 'email',
-      value: email,
-    }, refreshToken);
-
-    return [ accessToken, refreshToken ];
   }
 
   async logout(email: string) {

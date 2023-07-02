@@ -1,7 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { ActionEnum, RoleEnum, UserAbility } from '@shared/role';
 import { User, UserRepository } from '@shared/user';
-import { UserDto } from './dto';
+import { CreateUserDto } from './dto';
 
 @Injectable()
 export class ProfileService {
@@ -10,10 +10,10 @@ export class ProfileService {
     private readonly userAbility: UserAbility,
   ) {}
 
-  async create(issuer: User, user: UserDto) {
-    const { boss } = user;
+  async create(issuer: User, user: CreateUserDto) {
+    let { boss } = user;
     if (!boss)
-      throw new BadRequestException('No boss is provided');
+      boss = issuer.email;
 
     const bossUser = await this.userRepository.get({ field: 'email', value: boss });
     if (!bossUser)
@@ -24,7 +24,7 @@ export class ProfileService {
       await this.userRepository.updateRole({ field: 'email', value: boss }, RoleEnum.BOSS);
 
     return this.userRepository.create(
-      this.userRepository.createInstance({ ...user }),
+      this.userRepository.createInstance({ ...user, boss }),
     );
   }
 
@@ -34,7 +34,7 @@ export class ProfileService {
       throw new BadRequestException('Subordinate is not found');
 
     const ability = this.userAbility.ofUser(issuer);
-    if (!ability.can(ActionEnum.Update, subordinate))
+    if (ability.cannot(ActionEnum.Update, subordinate))
       throw new ForbiddenException('Forbidden resource');
 
     await this.userRepository.setBoss({ field: 'id', value: id }, boss);

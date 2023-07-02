@@ -1,7 +1,7 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsString, IsStrongPassword } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, IsStrongPassword } from 'class-validator';
 import { RoleEnum } from '@shared/role';
 
-export class UserDto {
+export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   readonly name!: string;
@@ -17,8 +17,10 @@ export class UserDto {
   readonly password!: string;
 
   @IsEmail()
-  readonly boss!: string | null;
+  @IsOptional()
+  readonly boss?: string | null;
 
+  @IsOptional()
   @IsEnum(RoleEnum)
   readonly role?: RoleEnum;
 }
