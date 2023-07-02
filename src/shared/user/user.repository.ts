@@ -15,7 +15,7 @@ export class UserRepository {
     @Inject(USER_REPOSITORY) private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(user: DeepPartial<User>) {
+  async create(user: User) {
     return this.userRepository.save(this.createInstance(user));
   }
 
@@ -30,12 +30,6 @@ export class UserRepository {
   async updateRefreshToken(criteria: UserCriteria, refreshToken: string | null) {
     const user = this.createInstance({ refreshToken });
     await this.userRepository.update({ [criteria.field]: criteria.value }, user);
-  }
-
-  async getRole(criteria: UserCriteria): Promise<RoleEnum|null> {
-    return this.userRepository
-      .findOne({ select: { role: true }, where: { [criteria.field]: criteria.value } })
-      .then(user => user ? user.role : null);
   }
 
   async getUserWithSubordinates(criteria: UserCriteria) {

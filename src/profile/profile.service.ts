@@ -23,7 +23,9 @@ export class ProfileService {
     if (ability.cannot(ActionEnum.Update, User))
       await this.userRepository.updateRole({ field: 'email', value: boss }, RoleEnum.BOSS);
 
-    return this.userRepository.create({ ...user });
+    return this.userRepository.create(
+      this.userRepository.createInstance({ ...user }),
+    );
   }
 
   async updateBoss(issuer: User, id: string, boss: string) {
