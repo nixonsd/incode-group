@@ -4,6 +4,8 @@ The application was produced due to testing purposes. The application can be spr
 ## Requirements
 - PostgreSQL Running
 - Node.js and npm
+- Docker
+- docker-compose
 
 ## Clone repository
 Use the command to clone this repository to your computer:
@@ -40,6 +42,7 @@ INIT_ADMIN_PASSWORD="KGhqXE'U6=eJ)8k9"
 
 # PostgreSQL
 POSTGRE_HOST=localhost
+# POSTGRE_HOST=postgres # > Use it if you run app in docker
 POSTGRE_PORT=5432
 POSTGRE_USER=postgres
 POSTGRE_PASS=12345678
@@ -77,6 +80,24 @@ $ npm run start
 
 # production mode
 $ npm run start:prod
+```
+
+## Run using Docker
+> To check the status of any running container use `docker logs --follow <container_name>`
+
+Build the image:
+``` bash
+$ docker compose build app-incode-group --no-cache
+```
+
+Start the application with the `init` script (it creates the initial user), after running this command you can check all running containers using `docker ps -a`, or use Docker Desktop as an alternative:
+```bash
+$ docker compose up -d app-init 
+```
+
+Or simply run the incode-group application:
+```bash
+$ docker compose up -d app-incode-group 
 ```
 
 ## License
