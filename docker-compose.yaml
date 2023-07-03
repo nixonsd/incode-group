@@ -1,0 +1,59 @@
+version: '3.1'
+
+networks:
+  incode-group:
+    driver: bridge
+
+volumes:
+  postgres_data: {}
+
+services:
+  app-incode-group:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: app-incode-group:latest
+    container_name: app-incode-group
+    command: npm run start
+    restart: always
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    expose:
+      - ${APP_PORT}
+    networks:
+      - incode-group
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+
+  app-init:
+    image: app-incode-group:latest
+    container_name: app-incode-group-init
+    command: npm run start:init:db:prod
+    networks:
+      - incode-group
+    depends_on:
+      - app-incode-group
+      - postgres
+    env_file:
+      - .env
+  
+  postgres:
+    image: postgres
+    container_name: incode-postgres
+    restart: always
+    ports:
+      - '5432:${POSTGRE_PORT}'
+    expose:
+      - ${POSTGRE_PORT}
+    environment:
+      POSTGRES_USER: ${POSTGRE_USER}
+      POSTGRES_PASSWORD: ${POSTGRE_PASS}
+      POSTGRES_DB: ${POSTGRE_DATABASE}
+    volumes: 
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - incode-group
+    env_file:
+      - .env
