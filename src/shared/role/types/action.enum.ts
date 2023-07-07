@@ -4,4 +4,5 @@ export enum ActionEnum {
   Check = 'check',
   List = 'list',
   Update = 'update',
+  BeChanged = 'be_changed',
 }

@@ -81,12 +81,12 @@ export class ProfileController {
   @ApiOperation({
     summary: 'Get subordinates of user',
   })
-  @ApiExtraModels(UserSearchDto, User)
-  @Get(':id/subordinates')
-  async getSubordinates(@Req() req: LoggedRequest, @Param() userSearch: UserSearchDto) {
-    return this.profileService.getSubordinatesById(
+  @ApiExtraModels(User)
+  @Get('subordinates')
+  async getSubordinates(@Req() req: LoggedRequest) {
+    return this.profileService.getSubordinatesOfIssuer(
       this.userRepository.createInstance(req.user),
-      userSearch.id);
+    );
   }
 
   @ApiBadRequestResponse({

@@ -1,11 +1,16 @@
 import bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
-import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent } from 'typeorm';
 import { SALT_ROUNDS } from './constants';
 import { RoleEnum } from '@shared/role';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('users')
+@Tree('closure-table', {
+  closureTableName: 'subordinate_closure',
+  ancestorColumnName: () => 'boss',
+  descendantColumnName: () => 'subordinate',
+})
 export class User {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
@@ -36,13 +41,11 @@ export class User {
   public role!: RoleEnum;
 
   @ApiProperty()
-  @ManyToOne(() => User, (boss) => boss.email, { nullable: true })
-  @JoinColumn({ name: 'boss', referencedColumnName: 'email' })
-  @Column('varchar', { name: 'boss', length: 256, nullable: true })
-  public boss!: string | null;
+  @TreeParent()
+  public boss!: User | null;
 
   @ApiProperty()
-  @OneToMany(() => User, (subordinate) => subordinate.boss, { nullable: true })
+  @TreeChildren()
   public subordinates!: User[] | null;
 
   @BeforeInsert()

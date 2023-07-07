@@ -1,5 +1,5 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { ActionEnum, RoleEnum, UserAbility } from '@shared/role';
+import { ActionEnum, UserAbility } from '@shared/role';
 import { User, UserRepository } from '@shared/user';
 import { CreateUserDto } from './dto';
 
@@ -11,36 +11,33 @@ export class ProfileService {
   ) {}
 
   async create(issuer: User, user: CreateUserDto) {
-    let { boss } = user;
-    if (!boss)
-      boss = issuer.email;
+    let { bossEmail } = user;
+    if (!bossEmail)
+      bossEmail = issuer.email;
 
-    const bossUser = await this.userRepository.get({ field: 'email', value: boss });
+    const bossUser = await this.userRepository.get({ field: 'email', value: bossEmail });
     if (!bossUser)
       throw new BadRequestException('Boss is not found');
 
-    const ability = this.userAbility.ofUser(bossUser);
-    const userInstance = this.userRepository.createInstance(user);
-    if (ability.cannot(ActionEnum.Update, userInstance))
-      await this.userRepository.updateRole({ field: 'email', value: boss }, RoleEnum.BOSS);
+    const userInstance = this.userRepository.createInstance({ ...user, boss: bossUser });
 
-    return this.userRepository.create(
-      this.userRepository.createInstance({ ...user, boss }),
-    );
+    return this.userRepository.create(userInstance);
   }
 
-  async updateBoss(issuer: User, id: string, boss: string) {
+  async updateBoss(issuer: User, id: string, bossEmail: string) {
     const subordinate = await this.userRepository.get({ field: 'id', value: id });
     if (!subordinate)
       throw new NotFoundException('Subordinate is not found');
-    if (!subordinate.boss)
-      throw new BadRequestException('Boss cannot be changed');
 
     const issuerAbility = this.userAbility.ofUser(issuer);
     if (issuerAbility.cannot(ActionEnum.Update, subordinate))
       throw new ForbiddenException('Forbidden resource');
 
-    await this.userRepository.transferSubordinate({ field: 'id', value: id }, subordinate.boss, boss);
+    const newBoss = await this.userRepository.get({ field: 'email', value: bossEmail });
+    if (!newBoss)
+      throw new BadRequestException('Boss is not found');
+
+    await this.userRepository.transferSubordinate(subordinate, newBoss);
   }
 
   async getById(id: string) {
@@ -51,29 +48,13 @@ export class ProfileService {
     return user;
   }
 
-  async getSubordinatesById(issuer: User, id: string) {
-    const user = await this.userRepository.getUserWithSubordinates({ field: 'id', value: id });
-    if (!user)
-      throw new NotFoundException('User is not found');
+  async getSubordinatesOfIssuer(issuer: User) {
+    const user = await this.userRepository.getUserWithRecursiveSubordinates(issuer);
 
-    const ability = this.userAbility.ofUser(user);
+    const ability = this.userAbility.ofUser(issuer);
     if (ability.can(ActionEnum.List, User))
       return this.userRepository.getAll();
 
     return user;
-  }
-
-  async onSubordinate(bossId: string) {
-    const boss = await this.userRepository.getUserWithSubordinates({ field: 'id', value: bossId });
-    if (!boss)
-      throw new NotFoundException('Boss is not found');
-
-    if (!boss?.subordinates?.length) {
-      boss.role = RoleEnum.REGULAR;
-    }
-
-    if (boss?.subordinates?.length && boss.role === RoleEnum.REGULAR)
-      boss.role = RoleEnum.BOSS;
-    await this.userRepository.updateRole({ field: 'id', value: bossId }, RoleEnum.BOSS);
   }
 }

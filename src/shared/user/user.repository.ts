@@ -1,68 +1,105 @@
 import { DeepPartial, Repository } from 'typeorm';
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { RoleEnum } from '@shared/role';
+import { Inject, Injectable } from '@nestjs/common';
+import { ActionEnum, RoleEnum, UserAbility } from '@shared/role';
 import { User } from './user.entity';
 import { USER_REPOSITORY } from './constants';
 
-export type UserCriteria = {
+export type SelectUserCriteria = {
   field: 'id' | 'email';
   value: string;
 };
+
+type RequestResponse = User & { subordinatesCount: number };
 
 @Injectable()
 export class UserRepository {
   constructor(
     @Inject(USER_REPOSITORY) private readonly userRepository: Repository<User>,
+    private readonly userAbility: UserAbility,
   ) {}
 
   async create(user: User) {
-    return this.userRepository.save(this.createInstance(user));
+    const boss = user.boss;
+    if (!boss && user.role !== RoleEnum.ADMINISTRATOR)
+      throw new Error('User cannot be created');
+
+    if (boss) {
+      const ability = this.userAbility.ofUser(boss);
+      if (ability.cannot(ActionEnum.Update, user))
+        await this.updateRole(user, RoleEnum.BOSS);
+    }
+
+    return this.userRepository.save(user);
   }
 
-  async transferSubordinate(criteria: UserCriteria, from: string, to: string) {
+  async transferSubordinate(subordinate: User, newBoss: User) {
+    const oldBoss = subordinate.boss;
+    if (!oldBoss)
+      throw new Error('Cannot change boss of user');
+
+    subordinate.boss = newBoss;
+    await this.userRepository.save(subordinate);
+
     const users = await this.userRepository
       .createQueryBuilder('user')
+      .select('id')
       .leftJoinAndSelect('user.subordinates', 'subordinates')
       .loadRelationCountAndMap('user.subordinatesCount', 'user.subordinates')
-      .where('user.email IN (:...emails)', { emails: [ from, to ] })
+      .where('user.email IN (:...email)', { emails: [ oldBoss.email, newBoss.email ] })
       .getMany();
 
-    const fromUser = users.find(user => user.email === from) as User & {subordinatesCount: number} | undefined;
-    const toUser = users.find(user => user.email === to) as User & {subordinatesCount: number} | undefined;
-    if (!fromUser || !toUser)
-      throw new NotFoundException('User is not found');
+    const { subordinatesCount: oldBossSubordinateCount } = users.find(({ id }) => id === subordinate.boss?.id) as RequestResponse;
+    const { subordinatesCount: newBossSubordinateCount } = users.find(({ id }) => id === newBoss.id) as RequestResponse;
 
-    if (fromUser.role !== RoleEnum.ADMINISTRATOR && fromUser.subordinatesCount - 1 < 1) {
-      await this.updateRole({ field: 'email', value: from }, RoleEnum.REGULAR);
-    }
+    if (!oldBossSubordinateCount)
+      await this.updateRole(oldBoss, RoleEnum.REGULAR);
 
-    if (toUser.role !== RoleEnum.ADMINISTRATOR && toUser.subordinatesCount + 1 >= 1) {
-      await this.updateRole({ field: 'email', value: to }, RoleEnum.BOSS);
-    }
-
-    await this.userRepository.update({ [criteria.field]: criteria.value }, { boss: to });
+    if (newBossSubordinateCount)
+      await this.updateRole(newBoss, RoleEnum.BOSS);
   }
 
-  async updateRole(criteria: UserCriteria, role: RoleEnum) {
-    await this.userRepository.update({ [criteria.field]: criteria.value }, { role });
-  }
+  async updateRole(user: User, role: RoleEnum) {
+    const ability = this.userAbility.ofUser(user);
+    if (ability.cannot(ActionEnum.BeChanged, user))
+      return;
 
-  async updateRefreshToken(criteria: UserCriteria, refreshToken: string | null) {
-    const user = this.createInstance({ refreshToken });
-    await this.userRepository.update({ [criteria.field]: criteria.value }, user);
-  }
-
-  async getUserWithSubordinates(criteria: UserCriteria) {
     return this.userRepository
-      .findOne({ where: { [criteria.field]: criteria.value }, relations: [ 'subordinates' ] });
+      .upsert(
+        [ { ...user, role } ],
+        { conflictPaths: [ 'id', 'email' ], skipUpdateIfNoValuesChanged: true },
+      );
   }
 
-  async exist(criteria: UserCriteria) {
-    return this.userRepository.exist({ where: { [criteria.field]: criteria.value } });
+  async updateRefreshToken(user: User, refreshToken: string | null) {
+    return this.userRepository
+      .upsert(
+        [ { ...user, refreshToken } ],
+        { conflictPaths: [ 'id', 'email' ], skipUpdateIfNoValuesChanged: true },
+      );
   }
 
-  async get(criteria: UserCriteria) {
-    return this.userRepository.findOne({ where: { [criteria.field]: criteria.value } });
+  async getUserWithRecursiveSubordinates(user: User) {
+    return this.userRepository
+      .manager
+      .getTreeRepository(User)
+      .findDescendantsTree(user);
+  }
+
+  async exist(criteria: SelectUserCriteria) {
+    return this.userRepository.exist({
+      where: {
+        [criteria.field]: criteria.value,
+      },
+    });
+  }
+
+  async get(criteria: SelectUserCriteria) {
+    return this.userRepository.findOne({
+      where: {
+        [criteria.field]: criteria.value,
+      },
+      relations: [ 'boss' ],
+    });
   }
 
   async getAll() {

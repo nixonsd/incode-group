@@ -20,10 +20,11 @@ export class AuthService {
   }
 
   async logout(email: string) {
-    return this.userRepository.updateRefreshToken({
-      field: 'email',
-      value: email,
-    }, null);
+    const user = await this.userRepository.get({ field: 'email', value: email });
+    if (!user)
+      throw new BadRequestException('Logout incorrect data');
+
+    return this.userRepository.updateRefreshToken(user, null);
   }
 
   async signIn(authDto: AuthDto) {
@@ -41,10 +42,7 @@ export class AuthService {
     const accessToken = await this.getAccessToken(jwtPayload);
     const refreshToken = await this.getRefreshToken(jwtPayload);
 
-    await this.userRepository.updateRefreshToken({
-      field: 'email',
-      value: email,
-    }, refreshToken);
+    await this.userRepository.updateRefreshToken(user, refreshToken);
 
     return [ accessToken, refreshToken ];
   }
@@ -64,10 +62,7 @@ export class AuthService {
     const accessToken = await this.getAccessToken(jwtPayload);
     const refreshToken = await this.getRefreshToken(jwtPayload);
 
-    await this.userRepository.updateRefreshToken({
-      field: 'email',
-      value: email,
-    }, refreshToken);
+    await this.userRepository.updateRefreshToken(user, refreshToken);
 
     return [ accessToken, refreshToken ];
   }

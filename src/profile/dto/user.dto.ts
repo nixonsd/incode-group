@@ -24,7 +24,7 @@ export class CreateUserDto {
   @ApiProperty()
   @IsEmail()
   @IsOptional()
-  readonly boss?: string | null;
+  readonly bossEmail?: string | null;
 
   @ApiProperty()
   @IsOptional()
