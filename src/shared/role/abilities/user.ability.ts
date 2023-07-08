@@ -10,15 +10,15 @@ export type AppAbility = Ability<[ActionEnum, Subjects]>;
 @Injectable()
 export class UserAbility {
   ofUser(user: User) {
-    const { can, cannot, build } = new AbilityBuilder<
+    const { can, build } = new AbilityBuilder<
       Ability<[ActionEnum, Subjects]>
     >(Ability as AbilityClass<AppAbility>);
 
     if (user.role === RoleEnum.ADMINISTRATOR) {
       can(ActionEnum.Manage, 'all');
-      cannot(ActionEnum.BeChanged, User);
     } else {
       can(ActionEnum.Check, 'all');
+      can(ActionEnum.BeChanged, User);
     }
 
     if (user.role !== RoleEnum.REGULAR)

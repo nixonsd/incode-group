@@ -25,15 +25,17 @@ export class UserRepository {
 
     if (boss) {
       const ability = this.userAbility.ofUser(boss);
-      if (ability.cannot(ActionEnum.Update, user))
+      if (ability.cannot(ActionEnum.Update, user)) {
+        boss.role = RoleEnum.BOSS;
         await this.updateRole(user, RoleEnum.BOSS);
+      }
     }
 
     return this.userRepository.save(user);
   }
 
   async transferSubordinate(subordinate: User, newBoss: User) {
-    const oldBoss = subordinate.boss;
+    const oldBoss = Object.assign({}, subordinate.boss);
     if (!oldBoss)
       throw new Error('Cannot change boss of user');
 
@@ -42,13 +44,12 @@ export class UserRepository {
 
     const users = await this.userRepository
       .createQueryBuilder('user')
-      .select('id')
       .leftJoinAndSelect('user.subordinates', 'subordinates')
       .loadRelationCountAndMap('user.subordinatesCount', 'user.subordinates')
-      .where('user.email IN (:...email)', { emails: [ oldBoss.email, newBoss.email ] })
+      .where('user.email IN (:...emails)', { emails: [ oldBoss.email, newBoss.email ] })
       .getMany();
 
-    const { subordinatesCount: oldBossSubordinateCount } = users.find(({ id }) => id === subordinate.boss?.id) as RequestResponse;
+    const { subordinatesCount: oldBossSubordinateCount } = users.find(({ id }) => id === oldBoss.id) as RequestResponse;
     const { subordinatesCount: newBossSubordinateCount } = users.find(({ id }) => id === newBoss.id) as RequestResponse;
 
     if (!oldBossSubordinateCount)
@@ -60,22 +61,14 @@ export class UserRepository {
 
   async updateRole(user: User, role: RoleEnum) {
     const ability = this.userAbility.ofUser(user);
-    if (ability.cannot(ActionEnum.BeChanged, user))
+    if (ability.cannot(ActionEnum.BeChanged, User))
       return;
 
-    return this.userRepository
-      .upsert(
-        [ { ...user, role } ],
-        { conflictPaths: [ 'id', 'email' ], skipUpdateIfNoValuesChanged: true },
-      );
+    return this.userRepository.update({ email: user.email }, this.createInstance({ role }));
   }
 
   async updateRefreshToken(user: User, refreshToken: string | null) {
-    return this.userRepository
-      .upsert(
-        [ { ...user, refreshToken } ],
-        { conflictPaths: [ 'id', 'email' ], skipUpdateIfNoValuesChanged: true },
-      );
+    return this.userRepository.update({ email: user.email }, this.createInstance({ refreshToken }));
   }
 
   async getUserWithRecursiveSubordinates(user: User) {
