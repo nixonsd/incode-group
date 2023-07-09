@@ -58,6 +58,10 @@ export class User {
       this.refreshToken = await bcrypt.hash(this.refreshToken, SALT_ROUNDS);
   }
 
+  static get modelName() {
+    return 'User';
+  }
+
   static async verifyHash(raw: string, hash: string) {
     return bcrypt.compare(raw, hash);
   }

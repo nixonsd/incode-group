@@ -26,8 +26,8 @@ export class UserRepository {
     if (boss) {
       const ability = this.userAbility.ofUser(boss);
       if (ability.cannot(ActionEnum.Update, user)) {
+        await this.updateRole(boss, RoleEnum.BOSS);
         boss.role = RoleEnum.BOSS;
-        await this.updateRole(user, RoleEnum.BOSS);
       }
     }
 
@@ -61,8 +61,8 @@ export class UserRepository {
 
   async updateRole(user: User, role: RoleEnum) {
     const ability = this.userAbility.ofUser(user);
-    if (ability.cannot(ActionEnum.BeChanged, User))
-      return;
+    if (ability.cannot(ActionEnum.BeChanged, User, 'role'))
+      return null;
 
     return this.userRepository.update({ email: user.email }, this.createInstance({ role }));
   }

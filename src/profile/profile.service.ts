@@ -30,7 +30,7 @@ export class ProfileService {
       throw new NotFoundException('Subordinate is not found');
 
     const issuerAbility = this.userAbility.ofUser(issuer);
-    if (issuerAbility.cannot(ActionEnum.Update, subordinate))
+    if (issuerAbility.cannot(ActionEnum.Update, subordinate, 'boss'))
       throw new ForbiddenException('Forbidden resource');
 
     const newBoss = await this.userRepository.get({ field: 'email', value: bossEmail });

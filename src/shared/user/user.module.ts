@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { RoleModule } from '@shared/role';
 import { DATA_SOURCE, DBModule } from '@shared/db';
 import { User } from './user.entity';
@@ -9,7 +9,7 @@ import { UserRepository } from './user.repository';
 @Module({
   imports: [
     DBModule,
-    RoleModule,
+    forwardRef(() => RoleModule),
   ],
   providers: [
     {
