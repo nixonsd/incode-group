@@ -21,7 +21,7 @@ import { DATA_SOURCE } from './constants';
           entities: [
             `${__dirname  }/../**/*.entity{.ts,.js}`,
           ],
-          synchronize: false,
+          synchronize: dbConfig.synchronize,
         });
 
         return dataSource.initialize();

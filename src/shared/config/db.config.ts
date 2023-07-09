@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 import { DEFAULT_POSTGRE_PORT } from './constants';
 
 export interface IDatabaseConfig {
@@ -7,6 +7,7 @@ export interface IDatabaseConfig {
   user?: string;
   password?: string;
   db: string;
+  synchronize: boolean;
 }
 
 export class DatabaseConfigValidator implements IDatabaseConfig {
@@ -26,6 +27,9 @@ export class DatabaseConfigValidator implements IDatabaseConfig {
 
   @IsString()
   readonly db!: string;
+
+  @IsBoolean()
+  readonly synchronize!: boolean;
 }
 
 export const getDatabaseConfig = (): IDatabaseConfig => ({
@@ -34,4 +38,5 @@ export const getDatabaseConfig = (): IDatabaseConfig => ({
   user: process.env.POSTGRE_USER,
   password: process.env.POSTGRE_PASS,
   db: process.env.POSTGRE_DATABASE as string,
+  synchronize: process.env.POSTGRE_SYNCHRONIZE === 'true' ? true : false,
 });
